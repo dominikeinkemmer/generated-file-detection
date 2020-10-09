@@ -34,10 +34,22 @@ func (d detector) IsGenerated(filePath string) (bool, error) {
 		return isGenerated, err
 	}
 
+	// If name based checks did not result in a detection, read the file and pass it down
+	lines := linesinternal.New(filePath)
+
+	err = lines.ReadFile()
+
+	if err != nil {
+		return false, err
+	}
+
+	d.Lines = lines
+
 	isGenerated = d.isMinified() ||
 		d.hasSourceMap() ||
 		d.isSourceMap() ||
-		d.isCompiledCoffeeScript()
+		d.isCompiledCoffeeScript() ||
+		d.isDotNetDocFile()
 
 	return isGenerated, nil
 }
@@ -55,7 +67,13 @@ func (d detector) isGeneratedByName() (bool, error) {
 		return isGenerated, err
 	}
 
-	return d.isCarthageBuild()
+	isGenerated, err = d.isCarthageBuild()
+
+	if isGenerated {
+		return isGenerated, err
+	}
+
+	return d.isDotNetDesignerFile() || d.isDotNetSpecFlowFeatureFile(), nil
 }
 
 // isXcodeFile checks if the file is an xcode file by checking the file extension
