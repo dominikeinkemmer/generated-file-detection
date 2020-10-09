@@ -49,7 +49,8 @@ func (d detector) IsGenerated(filePath string) (bool, error) {
 		d.hasSourceMap() ||
 		d.isSourceMap() ||
 		d.isCompiledCoffeeScript() ||
-		d.isDotNetDocFile()
+		d.isDotNetDocFile() ||
+		d.isGoGenerated()
 
 	return isGenerated, nil
 }
@@ -73,7 +74,13 @@ func (d detector) isGeneratedByName() (bool, error) {
 		return isGenerated, err
 	}
 
-	return d.isDotNetDesignerFile() || d.isDotNetSpecFlowFeatureFile(), nil
+	isGenerated = d.isDotNetDesignerFile() ||
+		d.isDotNetSpecFlowFeatureFile() ||
+		d.isGoLock() ||
+		d.isGoVendor() ||
+		d.isGoDeps()
+
+	return isGenerated, nil
 }
 
 // isXcodeFile checks if the file is an xcode file by checking the file extension
