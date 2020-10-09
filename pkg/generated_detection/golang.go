@@ -30,6 +30,10 @@ func (d detector) isGoDeps() bool {
 // We follow the following proposal by the golang community for this approach:
 // https://github.com/golang/go/issues/13560#issuecomment-288457920
 func (d detector) isGoGenerated() bool {
+	if !d.hasExtension(".go") || d.Lines.Len() < 2 {
+		return false
+	}
+
 	// If any line contains a match for this string, it is a generated file
 	re := regexp.MustCompile("^// Code generated .* DO NOT EDIT\\.$")
 
