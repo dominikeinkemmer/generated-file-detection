@@ -34,6 +34,10 @@ func (d detector) IsGenerated(filePath string) (bool, error) {
 		return isGenerated, err
 	}
 
+	isGenerated = d.isMinified() ||
+		d.hasSourceMap() ||
+		d.isSourceMap() ||
+		d.isCompiledCoffeeScript()
 
 	return isGenerated, nil
 }
